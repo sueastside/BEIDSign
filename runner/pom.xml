@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>runner</artifactId>
+    <name>Alfresco, Share and Solr Tomcat Runner</name>
+    <packaging>pom</packaging>
+    <description>Alfresco, Share and Solr Tomcat Runner</description>
+
+    <parent>
+        <groupId>be.redtree</groupId>
+        <artifactId>beidsign</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <profiles>
+        <profile>
+            <id>service</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-wars</id>
+                                <goals>
+                                    <goal>run-war-only</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                            </execution>
+                        </executions>
+                        
+                        <configuration>
+                        	<port>8081</port>
+                        	<httpsPort>8444</httpsPort>
+			                <keystoreFile>${basedir}/keystore.jks</keystoreFile>
+			                <keystorePass>password</keystorePass>
+			                <webapps>
+                                <webapp>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>beidsign-service</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <asWebapp>true</asWebapp>
+                                    <contextPath>beidsign-service</contextPath>
+                                </webapp>
+                            </webapps>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    
+        <profile>
+            <id>alfresco-share</id>
+            <properties>
+                <solr.project.dir>${project.basedir}/../solr</solr.project.dir>
+            </properties>
+            <build>
+                <plugins>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.1</version>
+						<configuration>
+							<compilerId>eclipse</compilerId>
+							<source>1.6</source>
+							<target>1.6</target>
+						</configuration>
+						<dependencies>
+							<dependency>
+			                   <groupId>org.codehaus.plexus</groupId>
+			                   <artifactId>plexus-compiler-eclipse</artifactId>
+			                   <version>2.2</version>
+			          		 </dependency>
+		          		 </dependencies>
+					</plugin>
+					
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-wars</id>
+                                <goals>
+                                    <goal>run-war-only</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                        	<httpsPort>8443</httpsPort>
+			                <keystoreFile>${basedir}/keystore.jks</keystoreFile>
+			                <keystorePass>password</keystorePass>
+                            <!-- Runs Solr as the "fake" main webapp. This is useful due to the currently poor OOTB zip packaging of Alfresco Solr -->
+                            <warDirectory>${solr.project.dir}/target/solr-overlay</warDirectory>
+                            <path>/solr</path>
+                            <systemProperties>
+                                <solr.solr.home>${solr.project.dir}/solr_home</solr.solr.home>
+                            </systemProperties>
+                            <!-- Configures the custom Alfresco and Share to run as embedded webapps -->
+                            <webapps>
+                                <webapp>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>alfresco</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <asWebapp>true</asWebapp>
+                                    <contextPath>alfresco</contextPath>
+                                </webapp>
+                                <webapp>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>share</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <asWebapp>true</asWebapp>
+                                    <contextPath>share</contextPath>
+                                </webapp>
+                            </webapps> 
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

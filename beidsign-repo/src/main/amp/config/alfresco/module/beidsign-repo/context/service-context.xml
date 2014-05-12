@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="beidsign.UserSignatureFactory" 
+        class="be.redtree.beidsign.signature.UserSignatureFactory">
+        <property name="serviceRegistry">
+			<ref bean="ServiceRegistry" />
+		</property>
+		<property name="beidSignService">
+        	<ref bean="beidsign.Service"/>
+        </property>
+    </bean>
+	
+    <bean id="beidsign.scriptService" parent="baseJavaScriptExtension" 
+        class="be.redtree.beidsign.service.ScriptBeidSignService">
+        <property name="extensionName">
+            <value>beidsign</value>
+        </property>     
+        <property name="serviceRegistry">
+            <ref bean ="ServiceRegistry"/>
+        </property>
+        <property name="userSignatureFactory">
+            <ref bean="beidsign.UserSignatureFactory" />
+        </property>
+        <property name="beidSignService">
+        	<ref bean="beidsign.Service"/>
+        </property>
+    </bean>
+    
+    <bean id="beidsign.Service"
+        class="be.redtree.beidsign.service.BeidSignService">    
+        <property name="serviceRegistry">
+            <ref bean ="ServiceRegistry"/>
+        </property>
+    </bean>
+
+</beans>

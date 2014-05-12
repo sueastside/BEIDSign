@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Applet Context</shortname>
+  <description>Applet Context</description>
+  <url>/beid/appletcontext</url>
+  <format default="html">extension</format>
+  <authentication>user</authentication>
+  <family>beid</family>
+  <cache>
+    <never>true</never>
+  </cache>
+</webscript>

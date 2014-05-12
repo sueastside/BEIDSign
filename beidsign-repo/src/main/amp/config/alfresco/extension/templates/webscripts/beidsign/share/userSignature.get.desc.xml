@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>User Signature</shortname>
+  <description>Get user's signature image</description>
+  <url>/beidsign/signature/user</url>
+  <format default="json">extension</format>
+  <authentication>user</authentication>
+  <family>beidsign</family>
+</webscript>

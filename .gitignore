@@ -1,0 +1,13 @@
+*~
+.project
+.settings/
+alf_data_dev/
+.classpath
+solr_home/
+
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties

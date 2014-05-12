@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+	<template-type>be/redtree/beidsign/beidsign-document</template-type>
+	<properties>
+		<pageFamily>beid</pageFamily>
+	</properties>
+	<components>
+
+		<!-- Title -->
+		<component>
+			<region-id>title</region-id>
+			<url>/components/title/simple-title</url>
+			<properties>
+				<title>pages.beidsign.beidsigndocument.title</title>
+				<subtitle>pages.beidsign.beidsigndocument.subtitle</subtitle>
+			</properties>
+		</component>
+
+		<component>
+			<region-id>signature-toolbar</region-id>
+			<url>/components/beidsign/toolbar/signature-toolbar</url>
+			<properties>
+				<nodeRef>{nodeRef}</nodeRef>
+			</properties>
+		</component>
+
+		<!-- modified web previewer, allows drawing of signature regions -->
+		<component>
+			<region-id>web-preview</region-id>
+			<sub-components>
+				<sub-component id="default">
+					<evaluations>
+						<!-- if this is a PDF, show the countersign previewer (draw region enabled) -->
+						<evaluation id="pdf">
+							<evaluators>
+								<evaluator type="beid.signature.type.evaluator" />
+							</evaluators>
+							<url>/components/signature/web-preview-cs</url>
+							<properties>
+								<nodeRef>{nodeRef}</nodeRef>
+							</properties>
+						</evaluation>
+						<evaluation id="other">
+							<url>/components/preview/web-preview</url>
+							<properties>
+								<nodeRef>{nodeRef}</nodeRef>
+							</properties>
+						</evaluation>
+					</evaluations>
+				</sub-component>
+			</sub-components>
+		</component>
+
+		<!-- The signature form manager, used to assist in the handling of the 
+			sig submit -->
+		<component>
+			<region-id>signature-form-mgr</region-id>
+			<url>/components/beidsign/form-mgr/signature-form-mgr</url>
+		</component>
+
+		<!-- Signature Form -->
+		<component>
+			<region-id>signature-form</region-id>
+			<sub-components>
+				<sub-component id="default">
+					<url>/components/form</url>
+					<properties>
+						<submitType>json</submitType>
+						<showCaption>true</showCaption>
+						<formUI>true</formUI>
+						<showCancelButton>true</showCancelButton>
+						<showResetButton>true</showResetButton>
+						<itemKind>action</itemKind>
+						<itemId>beid.pdf-sign-action</itemId>
+						<destination>{nodeRef}</destination>
+						<redirect>/share/page/beidsign-document2?nodeRef={nodeRef}</redirect>
+						<submissionUrl>/beid/appletcontext?nodeRef={nodeRef}</submissionUrl>
+						<mode>create</mode>
+					</properties>
+				</sub-component>
+			</sub-components>
+		</component>
+
+	</components>
+</template-instance>

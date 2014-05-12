@@ -1,0 +1,44 @@
+.beidicon {
+  display: block;
+  position: relative;
+  width: 300px;
+  height: 176px;
+}
+.beidicon > div {
+  width: 454px;
+  height: 176px;
+  position: absolute;
+  background-image:url("sprite.png");
+  background-repeat:no-repeat;
+}
+
+.beidicon > .layer3 {
+  display: none;
+}
+.beidicon > .layer4 {
+  display: none;
+}
+.beidicon > .layer5 {
+  display: none;
+}
+
+.beidicon.pluggedin > .layer2 {
+  display: none;
+}
+
+.beidicon.card-missing > .layer3 {
+  display: block;
+}
+.beidicon.card-missing > .layer4 {
+  display: none;
+}
+
+.beidicon.card-inserted > .layer3 {
+  display: none;
+}
+.beidicon.card-inserted > .layer4 {
+  display: block;
+}
+.beidicon.activity > .layer5 {
+  display: block;
+}

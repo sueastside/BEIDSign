@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+
+	<!-- load the custom content model -->
+	<bean id="beidsign.signatureModel" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+		<property name="models">
+			<list>
+				<value>alfresco/module/beidsign-repo/model/BEIDSignModel.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="beidsign.bundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+		<property name="resourceBundles">
+			<list>
+				<value>alfresco.module.beidsign-repo.messages.beidsign-labels</value>
+			</list>
+		</property>
+	</bean>
+	
+
+	<bean id="beidsign.visibility" class="be.redtree.beidsign.constraints.MapConstraint" parent="action-constraint">
+		<property name="constraintMap">
+			<map>
+				<entry key="hidden" value="Hidden"/>
+				<entry key="visible" value="Visible"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="beidsign.position" class="be.redtree.beidsign.constraints.MapConstraint" parent="action-constraint">
+		<property name="constraintMap">
+			<map>
+				<entry key="topleft" value="Top left"/>
+				<entry key="topright" value="Top right"/>
+				<entry key="center" value="Center"/>
+				<entry key="bottomleft" value="Bottom left"/>
+				<entry key="bottomright" value="Bottom right"/>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="webscript.beidsign.appletcontext.get" 
+      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
+      parent="webscript">
+      <property name="repository" ref="repositoryHelper" />
+   	  <property name="serviceRegistry" ref="ServiceRegistry" />
+	</bean>
+	
+	<bean id="webscript.beidsign.appletcontext.post" 
+      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
+      parent="webscript">
+      <property name="repository" ref="repositoryHelper" />
+   	  <property name="serviceRegistry" ref="ServiceRegistry" />
+	</bean>
+	
+	<bean id="beid.pdf-sign-action"
+		class="be.redtree.beidsign.action.executer.PDFSignActionExecuter"
+		parent="action-executer">
+		<property name="applicableTypes">
+            <list>
+                <value>{http://www.alfresco.org/model/content/1.0}content</value>
+            </list>
+        </property>
+	</bean>
+	
+	
+	<import resource="classpath:alfresco/module/beidsign-repo/context/service-context.xml" />
+</beans>

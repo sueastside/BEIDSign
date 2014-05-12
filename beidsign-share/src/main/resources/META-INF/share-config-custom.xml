@@ -1,0 +1,74 @@
+<alfresco-config>
+	<config evaluator="string-compare" condition="WebFramework">
+        <web-framework>
+            <!-- Autowire Runtime Settings -->
+            <autowire>
+                <!-- Pick the mode: development, preview, production -->
+                <mode>development</mode>
+            </autowire>
+        </web-framework>
+    </config>
+    
+    <!-- Share config elements for the doclib actions -->
+	<config evaluator="string-compare" condition="DocLibActions">
+		<actions>
+			<!--
+			The sign-document action is for PDFs only (as they have special signature
+			needs and features
+			-->
+	        <action id="beidsign-document" type="pagelink" label="actions.beidsign.signDocument">
+	           <param name="page">beidsign-document?nodeRef={node.nodeRef}&amp;sigType=pdf</param>
+	           <evaluator>evaluator.beidsign.doclib.action.signableMimetype</evaluator>
+	        </action>
+	        
+	     </actions>
+	     <actionGroups>
+			<actionGroup id="document-browse">
+				<action index="601" id="beidsign-document"/>
+			</actionGroup>
+			<actionGroup id="document-details">
+				<action index="601" id="beidsign-document"/>
+			</actionGroup>
+		</actionGroups>
+	</config>
+	
+	<config evaluator="string-compare" condition="beid.pdf-sign-action">
+    	<forms>
+        	<form>
+        	    <field-visibility>
+        	        <show id="location" />
+        	        <show id="reason" />
+        	        <show id="visible" />
+        	        <show id="position" />
+        	        <show id="graphic" />
+        	        <show id="signature-json" />
+        	        <show id="geolocation" />
+        	    </field-visibility>
+                <appearance>
+                <!--  pdf-signature-provider-action -->
+                	<field id="visible">
+                        <control template="/be/redtree/components/form/controls/hidingCheckbox.ftl">
+                        	<control-param name="hideProperties">prop_graphic,prop_position,prop_signature-json</control-param>    
+                        </control>
+                    </field>
+                    <field id="position">
+                        <control template="/be/redtree/components/form/controls/signatureposition.ftl" >
+                        	<control-param name="placeholderOnly">false</control-param>
+                        </control>
+                    </field>
+                    <field id="graphic">
+                        <control template="/be/redtree/components/form/controls/hidingCheckbox.ftl">
+                        	<control-param name="hideProperties">prop_signature-json</control-param>    
+                        </control>
+                    </field>
+                    <field id="signature-json">
+                        <control template="/be/redtree/components/form/controls/signaturepad.ftl" />
+                    </field>
+                    <field id="geolocation">
+                        <control template="/be/redtree/components/form/controls/geolocation.ftl" />
+                    </field>
+                </appearance>
+            </form>
+        </forms>
+    </config>
+</alfresco-config>

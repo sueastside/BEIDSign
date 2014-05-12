@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Page Count</shortname>
+  <description>Get PDF document page count</description>
+  <url>/beidsign/pagecount?{nodeRef}</url>
+  <format default="json">extension</format>
+  <authentication>user</authentication>
+  <family>beidsign</family>
+</webscript>

@@ -1,0 +1,79 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>InitServlet</servlet-name>
+		<servlet-class>be.redtree.beid.servlets.InitServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>FinalizeServlet</servlet-name>
+		<servlet-class>be.redtree.beid.servlets.FinalizeServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>ExtractServlet</servlet-name>
+		<servlet-class>be.redtree.beid.servlets.ExtractServlet</servlet-class>
+	</servlet>
+	 
+	<servlet>
+		<servlet-name>AppletSignServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureServiceClass</param-name>
+			<param-value>be.redtree.beid.services.SignatureServiceImpl</param-value>
+		</init-param>
+		<init-param>
+			<param-name>IncludeCertificates</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletSignServiceServlet</servlet-name>
+		<url-pattern>/applet-service-sign</url-pattern>
+	</servlet-mapping>
+	 
+	<servlet-mapping>
+		<servlet-name>InitServlet</servlet-name>
+		<url-pattern>/start</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>FinalizeServlet</servlet-name>
+		<url-pattern>/stop</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>ExtractServlet</servlet-name>
+		<url-pattern>/extract</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>   
+	    <servlet-name>default</servlet-name>
+	    <url-pattern>*.jar</url-pattern>
+	</servlet-mapping>
+	 
+	<servlet-mapping>   
+	    <servlet-name>default</servlet-name>
+	    <url-pattern>*.css</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>   
+	    <servlet-name>default</servlet-name>
+	    <url-pattern>*.js</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>   
+	    <servlet-name>default</servlet-name>
+	    <url-pattern>*.png</url-pattern>
+	</servlet-mapping>
+	
+</web-app>
