@@ -44,21 +44,6 @@
 			</map>
 		</property>
 	</bean>
-
-
-	<bean id="webscript.beidsign.appletcontext.get" 
-      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
-      parent="webscript">
-      <property name="repository" ref="repositoryHelper" />
-   	  <property name="serviceRegistry" ref="ServiceRegistry" />
-	</bean>
-	
-	<bean id="webscript.beidsign.appletcontext.post" 
-      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
-      parent="webscript">
-      <property name="repository" ref="repositoryHelper" />
-   	  <property name="serviceRegistry" ref="ServiceRegistry" />
-	</bean>
 	
 	<bean id="beid.pdf-sign-action"
 		class="be.redtree.beidsign.action.executer.PDFSignActionExecuter"

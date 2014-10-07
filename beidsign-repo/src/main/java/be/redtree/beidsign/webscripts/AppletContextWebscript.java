@@ -1,26 +1,45 @@
 package be.redtree.beidsign.webscripts;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.faces.context.FacesContext;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.model.FileNotFoundException;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.extensions.webscripts.WebScriptSession;
 
 import be.redtree.beidsign.action.executer.PDFSignActionExecuter;
+import be.redtree.beidsign.signature.SignatureToImage;
+import be.redtree.beidsign.signature.UserSignature;
+import be.redtree.beidsign.signature.UserSignatureFactory;
 
 import com.google.gson.Gson;
 
@@ -28,6 +47,8 @@ public class AppletContextWebscript extends AbstractWebScript
 {
 	private ServiceRegistry registry;
 	private Repository repository;
+	private UserSignatureFactory userSignatureFactory;
+	private String methodType;
 
 	// for Spring injection
 	public void setRepository(Repository repository) {
@@ -38,19 +59,30 @@ public class AppletContextWebscript extends AbstractWebScript
 	public void setServiceRegistry(ServiceRegistry registry) {
 		this.registry = registry;
 	}
+	
+	// for Spring injection
+	public void setUserSignatureFactory(UserSignatureFactory userSignatureFactory) {
+		this.userSignatureFactory = userSignatureFactory;
+	}
+	
+	// for Spring injection
+	public void setMethodType(String methodType) {
+		this.methodType = methodType;
+	}
 
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException 
 	{
 		System.out.println("AppletContextWebscript::execute: ");
 		
-		//TODO: make https and configurable.
-		String serviceURL = "http://localhost:8081/beidsign-service/";
-		String serviceURLHttps = "https://localhost:8444/beidsign-service/";
+		Properties properties = getproperties();
+		
+		String serviceURL = properties.getProperty("serviceURL", "http://localhost:8081/beidsign-service/");
+		String serviceURLHttps = properties.getProperty("serviceURLHttps", "https://localhost:8444/beidsign-service/");
 		
 		WebScriptSession session = req.getRuntime().getSession();
 		JSONObject obj = new JSONObject();
-		if ("true".equalsIgnoreCase(req.getParameter("getSession"))) // GET
+		if ("GET".equalsIgnoreCase(methodType))
 		{
 			System.out.println("AppletContextWebscript::execute: GET");
 			try {
@@ -60,7 +92,7 @@ public class AppletContextWebscript extends AbstractWebScript
 				e.printStackTrace();
 			}
 		}
-		else // POST
+		else if ("POST".equalsIgnoreCase(methodType))
 		{
 			NodeRef workingCopy = null;
 			try
@@ -70,6 +102,17 @@ public class AppletContextWebscript extends AbstractWebScript
 				Map<String, Object> map = new HashMap<>();
 				map = gson.fromJson(req.getContent().getReader(), map.getClass());
 				System.out.println("MAP: "+map);
+				
+				
+				//Save Signature
+				int width = 350;
+		        int height = 75;
+		        String signatureJson = (String)map.get("prop_"+PDFSignActionExecuter.PARAM_SIGNATURE_JSON);
+				BufferedImage sigImage = SignatureToImage.convertJsonToImage(signatureJson, width, height);
+	       		// save the signature image back to the signatureProvider
+				String user = AuthenticationUtil.getRunAsUser();
+				UserSignature signatureProvider = userSignatureFactory.getUserSignature(user);
+	       		signatureProvider.saveSignatureImage(sigImage, signatureJson);
 				
 				Map<String,Object> params = new LinkedHashMap<>();
 				for (String param: PDFSignActionExecuter.PARAMS)
@@ -170,14 +213,59 @@ public class AppletContextWebscript extends AbstractWebScript
 				if (workingCopy != null)
 					registry.getCheckOutCheckInService().cancelCheckout(workingCopy);
 			}
-			
-			
-
+		}
+		else 
+		{
+			throw new WebScriptException(Status.STATUS_METHOD_NOT_ALLOWED,
+					"Method "+methodType+" not supported!");
 		}
 		
 		// build a JSON string and send it back
 		String jsonString = obj.toString();
 		res.getWriter().write(jsonString);
+	}
+	
+	protected Properties getproperties() {
+		
+		final ServiceRegistry serviceRegistry = this.registry;
+		
+		Properties properties = AuthenticationUtil.runAs(
+				new AuthenticationUtil.RunAsWork<Properties>() {
+					@Override
+					public Properties doWork() throws Exception {
+						
+						Properties properties = new Properties();
+
+						NodeRef companyHomeRef = repository.getCompanyHome();
+						List<String> pathElements = Arrays.asList(StringUtils.split("beid-config.cfg", '/'));
+						 
+						NodeRef propertiesNodeRef = null;
+						try {
+							propertiesNodeRef = serviceRegistry.getFileFolderService().resolveNamePath(companyHomeRef, pathElements).getNodeRef();
+						} catch(FileNotFoundException e) {
+							return properties;
+						}
+
+						System.out.println("propertiesNodeRef: "+ propertiesNodeRef);
+
+						ContentReader reader = serviceRegistry.getContentService().getReader(propertiesNodeRef, ContentModel.PROP_CONTENT);
+						
+						try {
+							properties.load(reader.getContentInputStream());
+							return properties;
+						} catch (ContentIOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+							return properties;
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+							return properties;
+						}
+					}
+				}, AuthenticationUtil.getAdminUserName());
+		
+		return properties;
 	}
 
 }

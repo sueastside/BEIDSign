@@ -34,5 +34,25 @@
             <ref bean ="ServiceRegistry"/>
         </property>
     </bean>
+    
+    
+
+	<bean id="webscript.beidsign.appletcontext.get" 
+      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
+      parent="webscript">
+      <property name="repository" ref="repositoryHelper" />
+   	  <property name="serviceRegistry" ref="ServiceRegistry" />
+   	  <property name="userSignatureFactory" ref="beidsign.UserSignatureFactory" />
+   	  <property name="methodType" value="GET" />
+	</bean>
+	
+	<bean id="webscript.beidsign.appletcontext.post" 
+      class="be.redtree.beidsign.webscripts.AppletContextWebscript"
+      parent="webscript">
+      <property name="repository" ref="repositoryHelper" />
+   	  <property name="serviceRegistry" ref="ServiceRegistry" />
+   	  <property name="userSignatureFactory" ref="beidsign.UserSignatureFactory" />
+   	  <property name="methodType" value="POST" />
+	</bean>
 
 </beans>

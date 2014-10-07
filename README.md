@@ -22,7 +22,14 @@
     mvn clean package
 
  Install the amps to alfresco and share and deploy the beidsign-service.war along side the alfresco-tier.
-
+ 
+##Running in production
+Create a 'beid-config.cfg' file in the 'Company Home' directory, make sure only admin has rights to it.
+Add the following content:
+	# This is how alfresco communicates with the service, this isn't external.
+    serviceURL=http://localhost:8081/beidsign-service/
+    # This is how the service communicates with the applet and how resources are served to the client, this is external.
+	serviceURLHttps=https://server.my:8444/beidsign-service/
 
 Notes
 -----
